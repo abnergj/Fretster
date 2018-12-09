@@ -1,11 +1,6 @@
 from enum import Enum
 
-# Abner-- A single underscore in front of variable name
-# indicates that it should be treated as private - You
-# shouldn't be accessing variable or changing this variable.
-# Unlike Java, all variables in python are public, so at the
-# end of the day the underscore is just a suggestion and you
-# can still use it like every other variable.
+# Constant strings for unicode sharp/flat
 _SHARP = u'♯'
 _FLAT = u'♭'
 
@@ -68,20 +63,8 @@ class _NoteAliaser(Enum):
             return self.name
 
 
-# Abner-- I didn't mean to throw you this far into the
-# deep end, but this is the best way I could come up with
-# doing this. The 'Note' class is an Enum. I can't come
-# up with a great, quick explanation so if you haven't
-# seen this before, look it up online. The python docs
-# do a good job at that. The reason I'm using an Enum
-# class is because enums pretty much just associate
-# an integer with a name. This means that an expression
-# like Note.A + 1 would give Note.As (A Sharp). Despite
-# the uglyness of the next thirty or so lines, it actually
-# makes everything more readable.
-#
 # Enum type defining Notes. Does not take into account
-# octaves.
+# octaves. Note.A + 12 == Note.A
 class Note(_NoteAliaser):
     A = 0
     AsBf = As = Bf = 1
@@ -107,6 +90,7 @@ class Note(_NoteAliaser):
         else:
             raise TypeError(f"Type {type(val)} is not supported for '+'")
 
+    # TODO: Impliment case for Note - Note = Interval
     # Integer Subtraction
     def __sub__(self, integer):
         return self if not isinstance(integer, int) else Note((self.value - integer) % 12)
@@ -115,17 +99,12 @@ class Note(_NoteAliaser):
     # it doesn't prefer sharps or flats (A♯ returned as A♯\B♭) but does prefer naturals
     # (F♭ returned as E)
     def __str__(self):
-        replaceSF = lambda st: st.replace('s', _SHARP).replace('f', _FLAT).replace('_', "")
+        repSF = lambda st: st.replace('s', _SHARP).replace('f', _FLAT).replace('_', "")
         if len(self.name) == 1:
             return self.name
         else:
-            return '/'.join([replaceSF(self.name[0:2]), replaceSF(self.name[2:])])
+            return '/'.join([repSF(self.name[0:2]), repSF(self.name[2:])])
 
-
-# Abner-- Ignore the underscores before the variable names when accessing them
-# i.e use pitch_obj.note to access instead of pitch_obj._note
-# Similarly ignore all the methods with @someshit over their definitions
-#
 # Class to keep track of Note and octave along with other useful methods
 class Pitch:
     _SHARP_FLAT = {-1: 'flat', 0: 'nat', 'sharp': 1}
@@ -145,7 +124,7 @@ class Pitch:
         self._octave = octave
         self._freq = Pitch.getFrequency(note, octave)
 
-    # note,freq,octave are all properties in order to validate assignments
+    # Note, Freq, Octave are all properties in order to validate assignments
     @property
     def note(self):
         return self._note
@@ -187,6 +166,12 @@ class Pitch:
     def freq(self, value):
         pass
 
+
+#==========================================
+#   Operator Methods
+#==========================================
+
+    #TODO: Add implementation for adding intervals
     def __add__(self, integer):
         if not isinstance(integer, int):
             raise TypeError("Operator '+' uses type 'int' and type 'Pitch'")
@@ -223,32 +208,12 @@ class Pitch:
         return other.note + other.octave * 12 <= self.note + self.octave * 12
 
 
-# Abner-- Alright. This is actually going to be super easy (assuming my code is right
-# haven't really tested it). Make a few functions using these classes. First make a
-# function that takes a Note object and the number of frets on the neck (int) and returns
-# a list of tuples (str, [ints]). The first member of the tup is the name of the String, a string (haha)
-# and the second member is the list of frets that the Note can be played on.
-#   Sidenote: A given note is referenced by Note.noteName where the Note name is the letter of the natural
-# note followed by s for a sharp and f for a flat. Ex: A -> Note.A
-#                                                      G♭ -> Note.Gf
-#   Second, make a functions that takes a Pitch object and again returns a list of tuple (str, ints)
-# this time, taking into account the octave (meaning each string will have at most one fret the pitch
-# can be played on).
-#   This is gonna go one of two ways. Either you'll have this done relatively quickly or it will take
-# you a long time. It depends on a) How well I wrote these comments and b) Whether or not you reach out
-# to me if you're confused. You can't do anything about a) so I suggest trying b). If you get done with
-# this and feel ambitious, try writing some code that uses this to do other stuff with music theory. For
-# example writing a function that takes a root note and gives the other notes in a chord should be pretty
-# easy. Same with writing a function that takes a note and returns a major scale. Both would be helpful in
-# the long run. Ok, I'm six beers in and wrote more than I meant to.
-# Good Luck
-
-
 def notesOnStrings(note):
     strings = [Note.E, Note.A, Note.D, Note.G, Note.B, Note.E]
     return [(st, [i for i in range(24) if st + i is note]) for st in strings]
 
 
+# TODO: Create a constant list for standard tuning
 def pitchOnStrings(pitch):
     strings = [Pitch(Note.E, 2), Pitch(Note.A, 2), Pitch(Note.D, 3), Pitch(Note.G, 3), Pitch(Note.B, 3),
                Pitch(Note.E, 4)]
