@@ -4,8 +4,9 @@ from enum import Enum
 _SHARP = u'♯'
 _FLAT = u'♭'
 
-
+# Enum class to represent different intervals
 class Interval(Enum):
+    #TODO: God these are ugly
     ROOT = P1 = d2 = dim2 = 0
     min2 = m2 = A1 = aug1 = 1
     maj2 = M2 = d3 = dim3 = 2
@@ -66,6 +67,11 @@ class _NoteAliaser(Enum):
 # Enum type defining Notes. Does not take into account
 # octaves. Note.A + 12 == Note.A
 class Note(_NoteAliaser):
+
+#==========================================
+# Enum Definitions
+#==========================================
+
     A = 0
     AsBf = As = Bf = 1
     B_Cf = B = Cf = 2
@@ -78,6 +84,10 @@ class Note(_NoteAliaser):
     FsGf = Fs = Gf = 9
     G = 10
     GsAf = Gs = Af = 11
+
+#==========================================
+# Operator methods
+#==========================================
 
     # Integer Addition. The parameter integer refers to the number of half-steps
     # above the note
@@ -208,15 +218,17 @@ class Pitch:
         return other.note + other.octave * 12 <= self.note + self.octave * 12
 
 
-def notesOnStrings(note):
-    strings = [Note.E, Note.A, Note.D, Note.G, Note.B, Note.E]
-    return [(st, [i for i in range(24) if st + i is note]) for st in strings]
-
-
-# TODO: Create a constant list for standard tuning
-def pitchOnStrings(pitch):
-    strings = [Pitch(Note.E, 2), Pitch(Note.A, 2), Pitch(Note.D, 3), Pitch(Note.G, 3), Pitch(Note.B, 3),
+# Constants for standard tuning
+_STANDARD_TUNING_NOTES = [Note.E, Note.A, Note.D, Note.G, Note.B, Note.E]
+_STANDARD_TUNING_PITCHES = [Pitch(Note.E, 2), Pitch(Note.A, 2), Pitch(Note.D, 3), Pitch(Note.G, 3), Pitch(Note.B, 3),
                Pitch(Note.E, 4)]
+
+# Gets the frets where a note can be played on the strings of a guitar. 
+def notesOnStrings(note,nFrets=24, tuning=_STANDARD_TUNING_NOTES):
+    return [(st, [i for i in range(nFrets) if st + i is note]) for st in tuning]
+
+# Gets the frets where a note can be played on the strings of a guitar.
+def pitchOnStrings(pitch, nFrets=24, tuning=_STANDARD_TUNING_PITCHES):
     return [(st,
-             None if len([i for i in range(24) if st + i == pitch]) is 0 else [i for i in range(24) if st + i == pitch][
-                 0]) for st in strings]
+             [] if len([i for i in range(nFrets) if st + i == pitch]) is 0 else [i for i in range(nFrets) if st + i == pitch][
+                 0]) for st in tuning]
