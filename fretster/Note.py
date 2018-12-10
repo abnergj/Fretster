@@ -57,6 +57,27 @@ class ChordEnum(Enum):
     Dom13 = (Interval.ROOT, Interval.M3, Interval.P5, Interval.M7, Interval.M9, Interval.M13)
     Maj7aug11 = (Interval.ROOT, Interval.M3, Interval.aug11, Interval.M7)
 
+    
+
+class Chord:
+    def __init__(self, root, chordType=ChordEnum.Maj):
+            self.root = root
+            self.chordType = chordType
+            self.tones = [c.value + self.root for c in self.chordType]
+    
+    @classmethod
+    def fromName(cls, string):
+        noteStr, chordStr = string.split("_")
+        return cls(Note[noteStr], ChordEnum[chordStr])
+
+    def __add__(self, val):
+        if isinstance(val, int) or isinstance(val,Interval):
+            return Chord(self.root + val,[tone + val for tone in self.tones])
+        
+            
+        else:
+            raise TypeError(f"Addition is not supported for type {type(val)}")
+        
 
 # Base class which adds functionality to Note
 class _NoteAliaser(Enum):
@@ -121,6 +142,15 @@ class Note(_NoteAliaser):
             return Note((self.value + val.value) % 12)
         else:
             raise TypeError(f"Type {type(val)} is not supported for '+'")
+
+    def __iadd__(self,val):
+        if isinstance(val,int):
+            return Note(self.value + val)
+        elif isinstance(val, Interval):
+            return Note(self.value + val.value)
+
+        else:
+            raise TypeError(f"Addition-Assignment not supported for type {type}")
 
     # TODO: Impliment case for Note - Note = Interval
     # Integer Subtraction
@@ -204,15 +234,40 @@ class Pitch:
 #==========================================
 
     #TODO: Add implementation for adding intervals
-    def __add__(self, integer):
-        if not isinstance(integer, int):
-            raise TypeError("Operator '+' uses type 'int' and type 'Pitch'")
-        return Pitch((self.note + integer),(self._note.value + integer) // 12 + self.octave)
+    def __add__(self, val):
+        if isinstance(val,int):
+            note = self.note + val
+            octave = self.octave + (self._note.value + val) // 12
+            return Pitch(Note.C, 0) if octave < 0 else Pitch(note,octave)
+        
+        elif isinstance(val, Interval):
+            note = self.note + val.value
+            octave = self.octave + (self._note.value + val.value) // 12
+            return Pitch(Note.C, 0) if octave < 0 else Pitch(note,octave)
+        
+        # Implement
+        elif isinstance(val, Pitch):
+            raise NotImplementedError
 
-        # Bounded below by A0. May change this later
-        if self._octave < 0:
-            self.note = Note.A
-            self.octave = 0
+        elif isinstance(val, Note):
+            return self + Pitch(val, self.octave)
+        
+        else:
+            raise TypeError(f"Addition not supported for {type(val)}")
+
+    def __iadd__(self,val):
+        if isinstance(val, Interval):
+            val = val.value
+        if isinstance(val, int):
+            octave = self.octave + (self._note.value + val) // 12
+            if octave < 0:
+                self.note = Note.C
+                self.octave = 0
+            else:
+                self.note += val
+                self.octave = octave
+      
+
 
     def __sub__(self, integer):
         return self + -integer
@@ -254,3 +309,7 @@ def pitchOnStrings(pitch, nFrets=24, tuning=_STANDARD_TUNING_PITCHES):
              None if len([i for i in range(nFrets) if st + i == pitch]) is 0 else [i for i in range(nFrets) if st + i == pitch][
                  0]) for st in tuning]
 
+x = Note.A
+print(x)
+x +=2
+print(x)
