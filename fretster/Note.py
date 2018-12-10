@@ -230,3 +230,4 @@ def pitchOnStrings(pitch, nFrets=24, tuning=_STANDARD_TUNING_PITCHES):
              None if len([i for i in range(nFrets) if st + i == pitch]) is 0 else [i for i in range(nFrets) if st + i == pitch][
                  0]) for st in tuning]
 
+#test
