@@ -33,6 +33,30 @@ class Interval(Enum):
     maj14 = M14 = d15 = dim15 = 23
     perf15 = doctave = A14 = aug14 = 24
 
+class ChordEnum(Enum):
+    # Youre right, it did suck writing this out
+    Maj = (Interval.ROOT, Interval.M3, Interval.P5)
+    m = (Interval.ROOT, Interval.m3, Interval.P5)
+    Aug = (Interval.ROOT, Interval.M3, Interval.aug5)
+    Dim = (Interval.ROOT, Interval.m3, Interval.dim5)
+    Sus4 = (Interval.ROOT, Interval.P4, Interval.P5)
+    Sus2 = (Interval.ROOT, Interval.M2, Interval.P5)
+    Maj7 = (Interval.ROOT, Interval.M3, Interval.P5, Interval.M7)
+    Dom7 = (Interval.ROOT, Interval.M3, Interval.P5, Interval.M7)
+    m7 = (Interval.ROOT, Interval.m3, Interval.P5, Interval.M7)
+    HalfDim = (Interval.ROOT, Interval.m3, Interval.dim5, Interval.M7)
+    Dim7 = (Interval.ROOT, Interval.m3, Interval.dim5, Interval.dim7)
+    Sixth = (Interval.ROOT, Interval.M3, Interval.P5, Interval.M6)
+    m6 = (Interval.ROOT, Interval.m3, Interval.P5, Interval.M6)
+    Add9 = (Interval.ROOT, Interval.M3, Interval.P5, Interval.M9)
+    Dom9 = (Interval.ROOT, Interval.M3, Interval.P5, Interval.M7, Interval.M9)
+    Maj9 = (Interval.ROOT, Interval.M3, Interval.P5, Interval.M7, Interval.M9)
+    m9 = (Interval.ROOT, Interval.m3, Interval.P5, Interval.M7, Interval.M9)
+    SixNine = (Interval.ROOT, Interval.M3, Interval.P5, Interval.M6, Interval.M9)
+    m11 = (Interval.ROOT, Interval.M3, Interval.P5, Interval.M7, Interval.P11)
+    Dom13 = (Interval.ROOT, Interval.M3, Interval.P5, Interval.M7, Interval.M9, Interval.M13)
+    Maj7aug11 = (Interval.ROOT, Interval.M3, Interval.aug11, Interval.M7)
+
 
 # Base class which adds functionality to Note
 class _NoteAliaser(Enum):
@@ -230,4 +254,3 @@ def pitchOnStrings(pitch, nFrets=24, tuning=_STANDARD_TUNING_PITCHES):
              None if len([i for i in range(nFrets) if st + i == pitch]) is 0 else [i for i in range(nFrets) if st + i == pitch][
                  0]) for st in tuning]
 
-#test
