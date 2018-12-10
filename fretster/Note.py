@@ -71,20 +71,19 @@ class Note(_NoteAliaser):
 #==========================================
 # Enum Definitions
 #==========================================
-
-    A = 0
-    AsBf = As = Bf = 1
-    B_Cf = B = Cf = 2
-    BsC = Bs = C = 3
-    CsDf = Cs = Df = 4
-    D = 5
-    DsEf = Ds = Ef = 6
-    E_Ff = E = Ff = 7
-    EsF = Es = F = 8
-    FsGf = Fs = Gf = 9
-    G = 10
-    GsAf = Gs = Af = 11
-
+    BsC = Bs = C = 0
+    CsDf = Cs = Df = 1
+    D = 2
+    DsEf = Ds = Ef = 3
+    E_Ff = E = Ff = 4
+    EsF = Es = F = 5
+    FsGf = Fs = Gf = 6
+    G = 7
+    GsAf = Gs = Af = 8
+    A = 9
+    AsBf = As = Bf = 10
+    B_Cf = B = Cf = 11
+   
 #==========================================
 # Operator methods
 #==========================================
@@ -92,7 +91,6 @@ class Note(_NoteAliaser):
     # Integer Addition. The parameter integer refers to the number of half-steps
     # above the note
     def __add__(self, val):
-
         if isinstance(val, int):
             return Note((self.value + val) % 12)
         elif isinstance(val, Interval):
@@ -185,8 +183,7 @@ class Pitch:
     def __add__(self, integer):
         if not isinstance(integer, int):
             raise TypeError("Operator '+' uses type 'int' and type 'Pitch'")
-        self._note = self.note + integer
-        self._octave = (self._note + integer) // 12 + self.octave
+        return Pitch((self.note + integer),(self._note.value + integer) // 12 + self.octave)
 
         # Bounded below by A0. May change this later
         if self._octave < 0:
@@ -230,5 +227,6 @@ def notesOnStrings(note,nFrets=24, tuning=_STANDARD_TUNING_NOTES):
 # Gets the frets where a note can be played on the strings of a guitar.
 def pitchOnStrings(pitch, nFrets=24, tuning=_STANDARD_TUNING_PITCHES):
     return [(st,
-             [] if len([i for i in range(nFrets) if st + i == pitch]) is 0 else [i for i in range(nFrets) if st + i == pitch][
+             None if len([i for i in range(nFrets) if st + i == pitch]) is 0 else [i for i in range(nFrets) if st + i == pitch][
                  0]) for st in tuning]
+
